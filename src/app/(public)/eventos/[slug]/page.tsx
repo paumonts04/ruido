@@ -19,13 +19,14 @@ export default async function EventoPage({ params }: Props) {
 
   if (!evento) notFound()
 
-  const { count: entradasVendidas } = await supabase
+  const { data: vendidas } = await supabase
     .from('entradas')
-    .select('*', { count: 'exact', head: true })
+    .select('cantidad')
     .eq('evento_id', evento.id)
     .eq('estado', 'completada')
 
-  const aforoDisponible = evento.aforo - (entradasVendidas ?? 0)
+  const totalVendidas = vendidas?.reduce((acc, e) => acc + e.cantidad, 0) ?? 0
+  const aforoDisponible = evento.aforo - totalVendidas
   const agotado = aforoDisponible <= 0
 
   const infoItems = [
@@ -38,7 +39,6 @@ export default async function EventoPage({ params }: Props) {
   return (
     <div className="px-8 py-16 max-w-4xl mx-auto">
 
-      {/* Fecha */}
       <div className="text-[9px] tracking-[0.15em] text-[#FF5C00] uppercase font-mono mb-4">
         {new Date(evento.fecha).toLocaleDateString('es-ES', {
           weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
@@ -47,14 +47,12 @@ export default async function EventoPage({ params }: Props) {
         {new Date(evento.fecha).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}H
       </div>
 
-      {/* Título */}
       <h1 className="font-[family-name:var(--font-display)] text-[clamp(64px,12vw,140px)] leading-[0.85] text-[#F0EAD6] tracking-widest mb-8">
         {evento.titulo}
       </h1>
 
       <div className="h-px bg-[#1a1a1a] mb-8" />
 
-      {/* Info grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
         {infoItems.map(({ label, value }) => (
           <div key={label}>
@@ -68,7 +66,6 @@ export default async function EventoPage({ params }: Props) {
         ))}
       </div>
 
-      {/* Descripción */}
       {evento.descripcion && (
         <p className="text-sm text-[#888] font-mono leading-relaxed max-w-xl mb-12">
           {evento.descripcion}
@@ -77,7 +74,6 @@ export default async function EventoPage({ params }: Props) {
 
       <div className="h-px bg-[#1a1a1a] mb-10" />
 
-      {/* Compra */}
       <ComprarEntrada
         eventoId={evento.id}
         eventoTitulo={evento.titulo}

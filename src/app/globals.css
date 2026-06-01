@@ -1,15 +1,29 @@
 @import "tailwindcss";
 
-:root {
-  --ruido-negro:    #0A0A0A;
-  --ruido-naranja:  #FF5C00;
-  --ruido-amarillo: #FFE500;
-  --ruido-blanco:   #F5F0E8;
-  --ruido-gris:     #1A1A1A;
+@theme {
+  --animate-ticker: ticker 20s linear infinite;
 }
 
-body {
-  background: var(--ruido-negro);
-  color: var(--ruido-blanco);
-  font-family: 'Space Grotesk', sans-serif; /* temporalmente, cambiaremos */
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: #080808;
+  color: #F0EAD6;
+  font-family: var(--font-mono), monospace;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #FF5C00;
+  color: #080808;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #080808; }
+::-webkit-scrollbar-thumb { background: #FF5C00; }

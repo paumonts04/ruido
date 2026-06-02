@@ -13,7 +13,7 @@ export default async function EventosPage() {
     .order('fecha', { ascending: true })
 
   return (
-    <div style={{ padding: '64px 48px' }}>
+    <div className="px-4 sm:px-8 md:px-12 py-10 md:py-16">
       <div style={{ marginBottom: 48 }}>
         <h1 style={{
           fontFamily: 'var(--font-display)',

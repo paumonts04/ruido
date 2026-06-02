@@ -27,7 +27,7 @@ export default async function AdminPage() {
         DASHBOARD
       </h1>
 
-      <div className="grid grid-cols-3 gap-4 mb-12">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
         {stats.map(({ label, value }) => (
           <div key={label} className="bg-[#0f0f0f] border border-[#1a1a1a] p-6">
             <div className="text-[9px] tracking-widest text-[#555] font-mono uppercase mb-3">

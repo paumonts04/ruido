@@ -11,9 +11,13 @@ export async function createClient() {
       cookies: {
         getAll() { return cookieStore.getAll() },
         setAll(cs) {
-          cs.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          )
+          try {
+            cs.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch {
+            // ignorar en Server Components de solo lectura
+          }
         },
       },
     }

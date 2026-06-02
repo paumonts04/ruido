@@ -37,7 +37,7 @@ export default async function EventoPage({ params }: Props) {
   ]
 
   return (
-    <div className="px-8 py-16 max-w-4xl mx-auto">
+    <div className="px-4 sm:px-8 py-10 md:py-16 max-w-4xl mx-auto">
 
       <div className="text-[9px] tracking-[0.15em] text-[#FF5C00] uppercase font-mono mb-4">
         {new Date(evento.fecha).toLocaleDateString('es-ES', {

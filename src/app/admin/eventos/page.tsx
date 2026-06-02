@@ -28,21 +28,21 @@ export default async function AdminEventosPage() {
           <p className="text-[#444] font-mono text-xs tracking-widest">No hay eventos todavía.</p>
         ) : (
           eventos.map(evento => (
-            <div key={evento.id} className="flex items-center justify-between bg-[#0f0f0f] border border-[#1a1a1a] px-4 py-3 hover:border-[#FF5C00] transition-colors">
-              <div className="flex items-center gap-6">
-                <div className={`w-2 h-2 rounded-full ${evento.publicado ? 'bg-[#FFE500]' : 'bg-[#333]'}`} />
-                <span className="font-[family-name:var(--font-display)] text-lg text-[#F0EAD6] tracking-widest">
+            <div key={evento.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-[#0f0f0f] border border-[#1a1a1a] px-4 py-3 hover:border-[#FF5C00] transition-colors gap-2 sm:gap-0">
+              <div className="flex items-center gap-3 sm:gap-6 flex-wrap">
+                <div className={`w-2 h-2 rounded-full shrink-0 ${evento.publicado ? 'bg-[#FFE500]' : 'bg-[#333]'}`} />
+                <span className="font-[family-name:var(--font-display)] text-base sm:text-lg text-[#F0EAD6] tracking-widest">
                   {evento.titulo}
                 </span>
                 <span className="text-[10px] text-[#555] font-mono tracking-widest">
                   {new Date(evento.fecha).toLocaleDateString('es-ES')}
                 </span>
-                <span className="text-[10px] text-[#555] font-mono tracking-widest">
+                <span className="hidden sm:inline text-[10px] text-[#555] font-mono tracking-widest">
                   {evento.lugar}
                 </span>
               </div>
-              <div className="flex items-center gap-4">
-                <span className="font-[family-name:var(--font-display)] text-lg text-[#FFE500]">
+              <div className="flex items-center gap-4 pl-5 sm:pl-0">
+                <span className="font-[family-name:var(--font-display)] text-base sm:text-lg text-[#FFE500]">
                   {evento.precio}€
                 </span>
                 <Link

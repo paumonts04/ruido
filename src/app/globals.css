@@ -9,6 +9,13 @@
   to   { transform: translateX(-50%); }
 }
 
+@keyframes fadeInOut {
+  0%   { opacity: 0; transform: scale(0.5) rotate(var(--r, 0deg)); }
+  20%  { opacity: 1; transform: scale(1.2) rotate(var(--r, 0deg)); }
+  80%  { opacity: 1; transform: scale(1) rotate(var(--r, 0deg)); }
+  100% { opacity: 0; transform: scale(0.8) rotate(var(--r, 0deg)); }
+}
+
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 

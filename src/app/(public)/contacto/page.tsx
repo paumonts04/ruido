@@ -30,7 +30,7 @@ export default function ContactoPage() {
 
   if (enviado) {
     return (
-      <div className="px-8 py-24 max-w-2xl mx-auto text-center">
+      <div className="px-4 sm:px-8 py-16 sm:py-24 max-w-2xl mx-auto text-center">
         <div className="w-16 h-16 border-2 border-[#FFE500] flex items-center justify-center mx-auto mb-8">
           <span className="font-[family-name:var(--font-display)] text-3xl text-[#FFE500]">✓</span>
         </div>
@@ -46,7 +46,7 @@ export default function ContactoPage() {
   }
 
   return (
-    <div className="px-8 py-16 max-w-2xl mx-auto">
+    <div className="px-4 sm:px-8 py-10 md:py-16 max-w-2xl mx-auto">
       <div className="mb-12">
         <h1 className="font-[family-name:var(--font-display)] text-[clamp(48px,8vw,96px)] leading-[0.85] text-[#F0EAD6] tracking-widest mb-4">
           HABLEMOS

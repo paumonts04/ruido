@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -44,6 +44,8 @@ export default function Hero() {
     moved: boolean
   } | null>(null)
   const stickersRef = useRef<StickerDef[]>([])
+  const containerRef = useRef<HTMLElement>(null)
+  const stickerEls = useRef<Record<number, HTMLDivElement | null>>({})
 
   const launchEasterEgg = () => {
     const emojis = ['⚡', '🔥', '✕', '◆', '▲', '●', '★']
@@ -103,19 +105,47 @@ export default function Hero() {
 
   stickersRef.current = STICKERS
 
+  const getClampedPos = useCallback((id: number, x: number, y: number): Pos => {
+    const container = containerRef.current
+    const el = stickerEls.current[id]
+    if (!container || !el) return { x, y }
+    const cr = container.getBoundingClientRect()
+    const er = el.getBoundingClientRect()
+    const cur = positionsRef.current[id]
+    const baseLeft = er.left - cur.x
+    const baseTop = er.top - cur.y
+    return {
+      x: Math.max(cr.left - baseLeft, Math.min(cr.right - baseLeft - er.width, x)),
+      y: Math.max(cr.top - baseTop, Math.min(cr.bottom - baseTop - er.height, y)),
+    }
+  }, [])
+
+  useEffect(() => {
+    const clampAll = () => {
+      setPositions(prev => {
+        const next = { ...prev }
+        for (const id of [1, 2, 3, 4]) {
+          next[id] = getClampedPos(id, prev[id].x, prev[id].y)
+        }
+        return next
+      })
+    }
+    const raf = requestAnimationFrame(clampAll)
+    window.addEventListener('resize', clampAll)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.removeEventListener('resize', clampAll)
+    }
+  }, [getClampedPos])
+
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
       if (!dragRef.current) return
       const { id, startMouseX, startMouseY, startPosX, startPosY } = dragRef.current
       const dx = e.clientX - startMouseX
       const dy = e.clientY - startMouseY
-      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
-        dragRef.current.moved = true
-      }
-      setPositions(prev => ({
-        ...prev,
-        [id]: { x: startPosX + dx, y: startPosY + dy },
-      }))
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragRef.current.moved = true
+      setPositions(prev => ({ ...prev, [id]: getClampedPos(id, startPosX + dx, startPosY + dy) }))
     }
 
     const onUp = () => {
@@ -130,13 +160,28 @@ export default function Hero() {
       setDraggingId(null)
     }
 
+    const onTouchMove = (e: TouchEvent) => {
+      if (!dragRef.current) return
+      e.preventDefault()
+      const touch = e.touches[0]
+      const { id, startMouseX, startMouseY, startPosX, startPosY } = dragRef.current
+      const dx = touch.clientX - startMouseX
+      const dy = touch.clientY - startMouseY
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragRef.current.moved = true
+      setPositions(prev => ({ ...prev, [id]: getClampedPos(id, startPosX + dx, startPosY + dy) }))
+    }
+
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mouseup', onUp)
     window.addEventListener('mouseleave', onUp)
+    window.addEventListener('touchmove', onTouchMove, { passive: false })
+    window.addEventListener('touchend', onUp)
     return () => {
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mouseup', onUp)
       window.removeEventListener('mouseleave', onUp)
+      window.removeEventListener('touchmove', onTouchMove)
+      window.removeEventListener('touchend', onUp)
     }
   }, [])
 
@@ -155,8 +200,23 @@ export default function Hero() {
     setDraggingId(id)
   }
 
+  const onTouchStart = (e: React.TouchEvent, id: number) => {
+    e.stopPropagation()
+    if (dragRef.current) return
+    const touch = e.touches[0]
+    dragRef.current = {
+      id,
+      startMouseX: touch.clientX,
+      startMouseY: touch.clientY,
+      startPosX: positionsRef.current[id].x,
+      startPosY: positionsRef.current[id].y,
+      moved: false,
+    }
+    setDraggingId(id)
+  }
+
   return (
-    <section style={{ position: 'relative', minHeight: '90vh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', overflow: 'hidden', padding: '96px 48px 64px' }}>
+    <section ref={containerRef} style={{ position: 'relative', minHeight: '90vh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', overflow: 'hidden', padding: '96px 48px 64px' }}>
 
       <div style={{
         position: 'absolute', inset: 0, opacity: 0.15, pointerEvents: 'none',
@@ -190,8 +250,10 @@ export default function Hero() {
         return (
           <div
             key={s.id}
+            ref={el => { stickerEls.current[s.id] = el }}
             draggable={false}
             onMouseDown={e => onMouseDown(e, s.id)}
+            onTouchStart={e => onTouchStart(e, s.id)}
             onDragStart={e => e.preventDefault()}
             style={{
               position: 'absolute',

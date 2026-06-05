@@ -44,8 +44,12 @@ export default function AdminNav() {
       </div>
 
       {/* Mobile menu dropdown */}
-      {menuOpen && (
-        <div className="md:hidden border-b border-[#1a1a1a] flex flex-col px-4 py-4 gap-1">
+      <div
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+          menuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="border-b border-[#1a1a1a] flex flex-col px-4 py-4 gap-1">
           {links.map(({ href, label, exact }) => {
             const active = exact ? pathname === href : pathname.startsWith(href) && href !== '/admin'
             const isAdmin = pathname === '/admin' && href === '/admin'
@@ -69,7 +73,7 @@ export default function AdminNav() {
             Cerrar sesión →
           </button>
         </div>
-      )}
+      </div>
 
       {/* Desktop sidebar */}
       <aside className="hidden md:flex w-56 border-r border-[#1a1a1a] flex-col py-8 px-6 shrink-0">

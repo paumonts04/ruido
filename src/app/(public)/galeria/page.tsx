@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import GaleriaGrid from '@/components/shared/GaleriaGrid'
 
 export const revalidate = 60
 
@@ -37,24 +38,7 @@ export default async function GaleriaPage() {
           ))}
         </div>
       ) : (
-        <div className="columns-2 md:columns-3 lg:columns-4 gap-3 space-y-3">
-          {fotos.map(foto => (
-            <div key={foto.id} className="break-inside-avoid group relative overflow-hidden">
-              <img
-                src={foto.url}
-                alt={foto.descripcion ?? ''}
-                className="w-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-              />
-              {foto.eventos && (
-                <div className="absolute bottom-0 left-0 right-0 bg-[#080808]/80 px-3 py-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                  <div className="font-[family-name:var(--font-display)] text-sm text-[#FF5C00] tracking-widest">
-                    {(foto.eventos as any).titulo}
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        <GaleriaGrid fotos={fotos as any} />
       )}
     </div>
   )

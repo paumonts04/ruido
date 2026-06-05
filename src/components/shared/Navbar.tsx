@@ -15,11 +15,11 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <nav className="border-b border-[var(--c-gris-mid)] relative">
+    <nav className="border-b border-[#1a1a1a] relative">
       <div className="flex items-center justify-between px-4 sm:px-8 py-5">
         <Link
           href="/"
-          className="font-[family-name:var(--font-display)] text-3xl text-[var(--c-naranja)] tracking-widest hover:opacity-80 transition-opacity"
+          className="font-[family-name:var(--font-display)] text-3xl text-[#FF5C00] tracking-widest hover:opacity-80 transition-opacity"
         >
           RUIDO
         </Link>
@@ -31,8 +31,8 @@ export default function Navbar() {
               href={href}
               className={`text-[10px] tracking-widest uppercase font-mono transition-colors ${
                 pathname.startsWith(href)
-                  ? 'text-[var(--c-naranja)]'
-                  : 'text-[var(--c-texto)] hover:text-[var(--c-crema)]'
+                  ? 'text-[#FF5C00]'
+                  : 'text-[#888] hover:text-[#F0EAD6]'
               }`}
             >
               {label}
@@ -43,7 +43,7 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           <Link
             href="/eventos"
-            className="text-[10px] tracking-widest font-bold font-mono bg-[var(--c-naranja)] text-[var(--c-negro)] px-4 py-2 hover:bg-[var(--c-amarillo)] transition-colors"
+            className="text-[10px] tracking-widest font-bold font-mono text-[#888] px-4 py-2 hover:text-[#FF5C00] transition-colors"
           >
             Entradas →
           </Link>
@@ -59,8 +59,12 @@ export default function Navbar() {
         </div>
       </div>
 
-      {menuOpen && (
-        <div className="md:hidden border-t border-[var(--c-gris-mid)] flex flex-col px-4 py-4 gap-5 bg-[#080808]">
+      <div
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+          menuOpen ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="border-t border-[#1a1a1a] flex flex-col px-4 py-4 gap-5 bg-[#080808]">
           {links.map(({ href, label }) => (
             <Link
               key={href}
@@ -68,15 +72,15 @@ export default function Navbar() {
               onClick={() => setMenuOpen(false)}
               className={`text-[11px] tracking-widest uppercase font-mono transition-colors ${
                 pathname.startsWith(href)
-                  ? 'text-[var(--c-naranja)]'
-                  : 'text-[var(--c-texto)] hover:text-[var(--c-crema)]'
+                  ? 'text-[#FF5C00]'
+                  : 'text-[#888] hover:text-[#F0EAD6]'
               }`}
             >
               {label}
             </Link>
           ))}
         </div>
-      )}
+      </div>
     </nav>
   )
 }

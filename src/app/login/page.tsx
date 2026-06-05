@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
@@ -49,13 +50,23 @@ export default function LoginPage() {
             onChange={e => setEmail(e.target.value)}
             className="w-full bg-[#0f0f0f] border border-[#1a1a1a] text-[#F0EAD6] font-mono text-xs px-4 py-3 outline-none focus:border-[#FF5C00] transition-colors tracking-wide placeholder:text-[#444]"
           />
-          <input
-            type="password"
-            placeholder="Contraseña"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            className="w-full bg-[#0f0f0f] border border-[#1a1a1a] text-[#F0EAD6] font-mono text-xs px-4 py-3 outline-none focus:border-[#FF5C00] transition-colors tracking-wide placeholder:text-[#444]"
-          />
+
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Contraseña"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              className="w-full bg-[#0f0f0f] border border-[#1a1a1a] text-[#F0EAD6] font-mono text-xs px-4 py-3 pr-12 outline-none focus:border-[#FF5C00] transition-colors tracking-wide placeholder:text-[#444]"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(v => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#444] hover:text-[#FF5C00] transition-colors font-mono text-[10px] tracking-widest uppercase"
+            >
+              {showPassword ? 'ocultar' : 'ver'}
+            </button>
+          </div>
 
           {error && (
             <p className="text-[11px] text-[#FF5C00] font-mono tracking-wide">{error}</p>

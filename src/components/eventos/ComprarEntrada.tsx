@@ -11,13 +11,14 @@ type Props = {
 }
 
 export default function ComprarEntrada({ eventoId, precio, agotado, aforoDisponible }: Props) {
-  const [cantidad, setCantidad] = useState(1)
+  const [cantidad, setCantidad] = useState<string | number>(1)
   const [nombre, setNombre] = useState('')
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const total = precio * cantidad
+  const cantidadNum = Number(cantidad) || 1
+  const total = precio * cantidadNum
 
   const handleCompra = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -29,7 +30,7 @@ export default function ComprarEntrada({ eventoId, precio, agotado, aforoDisponi
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ eventoId, nombre, email, cantidad }),
+        body: JSON.stringify({ eventoId, nombre, email, cantidad: cantidadNum }),
       })
 
       const data = await res.json()
@@ -83,15 +84,28 @@ export default function ComprarEntrada({ eventoId, precio, agotado, aforoDisponi
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => setCantidad(c => Math.max(1, c - 1))}
+              onClick={() => setCantidad(c => Math.max(1, Number(c) - 1))}
               className="bg-[#1a1a1a] text-[#F0EAD6] w-8 h-8 font-mono text-lg hover:bg-[#FF5C00] hover:text-[#080808] transition-colors"
             >−</button>
-            <span className="font-[family-name:var(--font-display)] text-2xl text-[#F0EAD6] min-w-6 text-center">
-              {cantidad}
-            </span>
+            <input
+              type="number"
+              min={1}
+              max={aforoDisponible}
+              value={cantidad}
+              onChange={e => {
+                const raw = e.target.value
+                if (raw === '') { setCantidad(''); return }
+                const v = parseInt(raw)
+                if (!isNaN(v)) setCantidad(Math.min(aforoDisponible, Math.max(1, v)))
+              }}
+              onBlur={() => {
+                if (cantidad === '' || Number(cantidad) < 1) setCantidad(1)
+              }}
+              className="w-12 bg-[#0f0f0f] border border-[#1a1a1a] text-[#F0EAD6] font-[family-name:var(--font-display)] text-2xl text-center outline-none focus:border-[#FF5C00] transition-colors tracking-widest [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
             <button
               type="button"
-              onClick={() => setCantidad(c => Math.min(aforoDisponible, c + 1))}
+              onClick={() => setCantidad(c => Math.min(aforoDisponible, Number(c) + 1))}
               className="bg-[#1a1a1a] text-[#F0EAD6] w-8 h-8 font-mono text-lg hover:bg-[#FF5C00] hover:text-[#080808] transition-colors"
             >+</button>
           </div>
@@ -116,7 +130,7 @@ export default function ComprarEntrada({ eventoId, precio, agotado, aforoDisponi
         disabled={loading}
         className="w-full bg-[#FF5C00] disabled:bg-[#333] text-[#080808] font-mono font-bold text-xs tracking-widest uppercase py-4 px-6 hover:bg-[#FFE500] disabled:cursor-not-allowed transition-colors"
       >
-        {loading ? 'Redirigiendo a Stripe...' : `Comprar ${cantidad > 1 ? `${cantidad} entradas` : 'entrada'} →`}
+        {loading ? 'Redirigiendo a Stripe...' : `Comprar ${cantidadNum > 1 ? `${cantidadNum} entradas` : 'entrada'} →`}
       </button>
     </form>
   )

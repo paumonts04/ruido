@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAdmin } from '@/lib/auth'
+import { galeriaSchema, galeriaDeleteSchema } from '@/lib/schemas'
 
 function createAdminClient() {
   return createClient(
@@ -14,13 +15,15 @@ export async function POST(req: NextRequest) {
   if (auth) return auth
 
   try {
-    const { url, descripcion, evento_id, orden } = await req.json()
+    const body = await req.json()
+    const parsed = galeriaSchema.safeParse(body)
+    if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 422 })
 
     const supabase = createAdminClient()
 
     const { data, error } = await supabase
       .from('galeria')
-      .insert({ url, descripcion, evento_id, orden })
+      .insert(parsed.data)
       .select('*, eventos(titulo)')
       .single()
 
@@ -37,11 +40,13 @@ export async function DELETE(req: NextRequest) {
   if (auth) return auth
 
   try {
-    const { id } = await req.json()
+    const body = await req.json()
+    const parsed = galeriaDeleteSchema.safeParse(body)
+    if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 422 })
 
     const supabase = createAdminClient()
 
-    const { error } = await supabase.from('galeria').delete().eq('id', id)
+    const { error } = await supabase.from('galeria').delete().eq('id', parsed.data.id)
 
     if (error) return NextResponse.json({ error: error.message }, { status: 400 })
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { requireAdmin } from '@/lib/auth'
+import { eventoSchema, eventoUpdateSchema, eventoDeleteSchema } from '@/lib/schemas'
 
 function createAdminClient() {
   return createClient(
@@ -16,11 +17,14 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json()
+    const parsed = eventoSchema.safeParse(body)
+    if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 422 })
+
     const supabase = createAdminClient()
 
     const { data, error } = await supabase
       .from('eventos')
-      .insert(body)
+      .insert(parsed.data)
       .select()
       .single()
 
@@ -36,12 +40,16 @@ export async function PUT(req: NextRequest) {
   if (auth) return auth
 
   try {
-    const { id, ...body } = await req.json()
+    const body = await req.json()
+    const parsed = eventoUpdateSchema.safeParse(body)
+    if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 422 })
+
+    const { id, ...rest } = parsed.data
     const supabase = createAdminClient()
 
     const { data, error } = await supabase
       .from('eventos')
-      .update(body)
+      .update(rest)
       .eq('id', id)
       .select()
       .single()
@@ -58,13 +66,16 @@ export async function DELETE(req: NextRequest) {
   if (auth) return auth
 
   try {
-    const { id } = await req.json()
+    const body = await req.json()
+    const parsed = eventoDeleteSchema.safeParse(body)
+    if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 422 })
+
     const supabase = createAdminClient()
 
     const { error } = await supabase
       .from('eventos')
       .delete()
-      .eq('id', id)
+      .eq('id', parsed.data.id)
 
     if (error) return NextResponse.json({ error: error.message }, { status: 400 })
     return NextResponse.json({ ok: true })

@@ -9,8 +9,8 @@ type EventoFormData = {
   descripcion: string
   fecha: string
   lugar: string
-  aforo: number
-  precio: number
+  aforo: string
+  precio: string
   publicado: boolean
 }
 
@@ -36,8 +36,8 @@ export default function EventoForm({ inicial, modo }: Props) {
     descripcion: inicial?.descripcion ?? '',
     fecha: inicial?.fecha ? new Date(inicial.fecha).toISOString().slice(0, 16) : '',
     lugar: inicial?.lugar ?? '',
-    aforo: inicial?.aforo ?? 100,
-    precio: inicial?.precio ?? 0,
+    aforo: inicial?.aforo != null ? String(inicial.aforo) : '100',
+    precio: inicial?.precio != null ? String(inicial.precio) : '0',
     publicado: inicial?.publicado ?? false,
   })
 
@@ -116,11 +116,11 @@ export default function EventoForm({ inicial, modo }: Props) {
       <div className="grid grid-cols-2 gap-4">
         <div className="flex flex-col gap-1">
           <label className="text-[9px] text-[#555] font-mono tracking-widest uppercase">Aforo</label>
-          <input type="number" value={form.aforo} onChange={e => setForm(f => ({ ...f, aforo: Number(e.target.value) }))} className={inputClass} />
+          <input type="number" value={form.aforo} onChange={e => setForm(f => ({ ...f, aforo: e.target.value }))} className={inputClass} />
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-[9px] text-[#555] font-mono tracking-widest uppercase">Precio (€)</label>
-          <input type="number" step="0.01" value={form.precio} onChange={e => setForm(f => ({ ...f, precio: Number(e.target.value) }))} className={inputClass} />
+          <input type="number" step="0.01" value={form.precio} onChange={e => setForm(f => ({ ...f, precio: e.target.value }))} className={inputClass} />
         </div>
       </div>
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 
 type Foto = {
   id: number
@@ -17,8 +18,6 @@ export default function GaleriaGrid({ fotos }: { fotos: Foto[] }) {
 
   const current = selected !== null ? fotos[selected] : null
 
-  // "from-right" = imagen entra desde la derecha (navegación hacia adelante →)
-  // "from-left"  = imagen entra desde la izquierda (navegación hacia atrás ←)
   const prev = () => {
     setAnimDir('left')
     setSelected(i => (i !== null ? (i - 1 + fotos.length) % fotos.length : null))
@@ -56,11 +55,17 @@ export default function GaleriaGrid({ fotos }: { fotos: Foto[] }) {
             className="break-inside-avoid group relative overflow-hidden cursor-zoom-in"
             onClick={() => setSelected(i)}
           >
-            <img
-              src={foto.url}
-              alt={foto.descripcion ?? ''}
-              className="w-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-            />
+            <div className="relative w-full">
+              <Image
+                src={foto.url}
+                alt={foto.descripcion ?? ''}
+                width={600}
+                height={400}
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className="w-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                loading="lazy"
+              />
+            </div>
             {foto.eventos && (
               <div className="absolute bottom-0 left-0 right-0 bg-[#080808]/80 px-3 py-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                 <div className="font-[family-name:var(--font-display)] text-sm text-[#FF5C00] tracking-widest">
@@ -94,10 +99,13 @@ export default function GaleriaGrid({ fotos }: { fotos: Foto[] }) {
             style={{ animation: `slide-from-${animDir} 0.25s ease` }}
             onClick={e => e.stopPropagation()}
           >
-            <img
+            <Image
               src={current.url}
               alt={current.descripcion ?? ''}
+              width={1200}
+              height={800}
               className="w-full max-h-[80vh] object-contain"
+              priority
             />
             {current.eventos && (
               <div className="mt-3 font-[family-name:var(--font-display)] text-sm text-[#FF5C00] tracking-widest">
@@ -112,7 +120,6 @@ export default function GaleriaGrid({ fotos }: { fotos: Foto[] }) {
           </div>
         )}
 
-        {/* Navegación */}
         <button
           className="absolute left-4 top-1/2 -translate-y-1/2 text-[#F0EAD6] hover:text-[#FF5C00] transition-colors text-3xl font-mono p-2"
           onClick={e => { e.stopPropagation(); prev() }}
@@ -128,7 +135,6 @@ export default function GaleriaGrid({ fotos }: { fotos: Foto[] }) {
           →
         </button>
 
-        {/* Cerrar */}
         <button
           className="absolute top-4 right-4 text-[#F0EAD6] hover:text-[#FF5C00] transition-colors text-2xl font-mono p-2"
           onClick={close}
@@ -137,7 +143,6 @@ export default function GaleriaGrid({ fotos }: { fotos: Foto[] }) {
           ✕
         </button>
 
-        {/* Contador */}
         {selected !== null && (
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-[#555] font-mono tracking-widest">
             {selected + 1} / {fotos.length}

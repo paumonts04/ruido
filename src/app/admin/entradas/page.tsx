@@ -1,12 +1,37 @@
 import { createClient } from '@/lib/supabase/server'
+import FiltroEntradas from '@/components/admin/FiltroEntradas'
 
-export default async function AdminEntradasPage() {
+type Props = {
+  searchParams: Promise<{ evento?: string }>
+}
+
+export default async function AdminEntradasPage({ searchParams }: Props) {
+  const { evento } = await searchParams
   const supabase = await createClient()
 
-  const { data: entradas } = await supabase
+  // Fetch eventos that have at least one entrada
+  const { data: eventosConEntradas } = await supabase
+    .from('entradas')
+    .select('evento_id, eventos(id, titulo)')
+    .not('evento_id', 'is', null)
+
+  const eventosUnicos = Array.from(
+    new Map(
+      (eventosConEntradas ?? [])
+        .map(e => (e.eventos as any))
+        .filter(Boolean)
+        .map((ev: { id: string; titulo: string }) => [ev.id, ev])
+    ).values()
+  ) as { id: string; titulo: string }[]
+
+  let query = supabase
     .from('entradas')
     .select('*, eventos(titulo)')
     .order('created_at', { ascending: false })
+
+  if (evento) query = query.eq('evento_id', evento)
+
+  const { data: entradas } = await query
 
   return (
     <div>
@@ -14,7 +39,9 @@ export default async function AdminEntradasPage() {
         ENTRADAS
       </h1>
 
-      <div className="flex flex-col gap-2">
+      <FiltroEntradas eventos={eventosUnicos} eventoActual={evento ?? 'todos'} />
+
+      <div className="flex flex-col gap-2 mt-6">
         {!entradas || entradas.length === 0 ? (
           <p className="text-[#444] font-mono text-xs tracking-widest">No hay entradas todavía.</p>
         ) : (

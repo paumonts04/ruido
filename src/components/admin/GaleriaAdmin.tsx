@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import Image from 'next/image'
 
 type Foto = {
   id: string
@@ -147,10 +148,13 @@ export default function GaleriaAdmin({ fotos: fotosIniciales, eventos }: Props) 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
           {fotos.map(foto => (
             <div key={foto.id} className="group relative aspect-square overflow-hidden border border-[#1a1a1a]">
-              <img
+              <Image
                 src={foto.url}
                 alt={foto.descripcion ?? ''}
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className="object-cover"
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-[#080808]/80 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
                 {foto.eventos && (

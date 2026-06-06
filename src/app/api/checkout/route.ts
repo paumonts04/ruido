@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/server'
+import { checkoutLimiter } from '@/lib/ratelimit'
 
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for') ?? 'anonymous'
+  const { success } = await checkoutLimiter.limit(ip)
+  if (!success) {
+    return NextResponse.json({ error: 'Demasiadas peticiones, inténtalo más tarde' }, { status: 429 })
+  }
+
   try {
     const { eventoId, nombre, email, cantidad } = await req.json()
 

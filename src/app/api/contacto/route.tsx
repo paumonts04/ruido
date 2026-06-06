@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
+import { contactoLimiter } from '@/lib/ratelimit'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for') ?? 'anonymous'
+  const { success } = await contactoLimiter.limit(ip)
+  if (!success) {
+    return NextResponse.json({ error: 'Demasiadas peticiones, inténtalo más tarde' }, { status: 429 })
+  }
+
   try {
     const { nombre, email, asunto, mensaje } = await req.json()
 
@@ -46,7 +53,7 @@ export async function POST(req: NextRequest) {
     })
 
     return NextResponse.json({ ok: true })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Error al enviar' }, { status: 500 })
   }
 }

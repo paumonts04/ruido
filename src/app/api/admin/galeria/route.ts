@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireAdmin } from '@/lib/auth'
 
 function createAdminClient() {
   return createClient(
@@ -9,6 +10,9 @@ function createAdminClient() {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAdmin(req)
+  if (auth) return auth
+
   try {
     const { url, descripcion, evento_id, orden } = await req.json()
 
@@ -29,6 +33,9 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  const auth = await requireAdmin(req)
+  if (auth) return auth
+
   try {
     const { id } = await req.json()
 

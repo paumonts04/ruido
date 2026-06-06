@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { requireAdmin } from '@/lib/auth'
 
 function createAdminClient() {
   return createClient(
@@ -10,6 +11,9 @@ function createAdminClient() {
 }
 
 export async function PUT(req: NextRequest) {
+  const auth = await requireAdmin(req)
+  if (auth) return auth
+
   try {
     const { id, leido } = await req.json()
     const supabase = createAdminClient()
